@@ -1,9 +1,13 @@
 package com.udacity.project4.locationreminders.reminderslist
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import com.firebase.ui.auth.AuthUI
 import com.udacity.project4.R
+import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentRemindersBinding
@@ -63,7 +67,6 @@ class ReminderListFragment : BaseFragment() {
     private fun setupRecyclerView() {
         val adapter = RemindersListAdapter {
         }
-
 //        setup the recycler view using the extension function
         binding.reminderssRecyclerView.setup(adapter)
     }
@@ -71,7 +74,20 @@ class ReminderListFragment : BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.logout -> {
-//                TODO: add the logout implementation
+                AuthUI.getInstance()
+                    .signOut(requireContext())
+                    .addOnCompleteListener {
+                        if(it.isSuccessful){
+                            Toast.makeText(requireContext(), "Successfully logged out.", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(requireContext(), AuthenticationActivity::class.java))
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Error logging out.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
             }
         }
         return super.onOptionsItemSelected(item)
