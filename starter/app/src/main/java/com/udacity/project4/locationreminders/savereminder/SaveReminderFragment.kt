@@ -132,7 +132,7 @@ class SaveReminderFragment : BaseFragment() {
             priority = LocationRequest.PRIORITY_LOW_POWER
         }
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
-        val settingsClient = context?.let { LocationServices.getSettingsClient(it) }
+        val settingsClient = LocationServices.getSettingsClient(requireContext())
         val locationSettingsResponseTask =
             settingsClient?.checkLocationSettings(builder.build())
         locationSettingsResponseTask?.addOnFailureListener { exception ->
@@ -160,14 +160,14 @@ class SaveReminderFragment : BaseFragment() {
 
         locationSettingsResponseTask?.addOnCompleteListener {
             if (it.isSuccessful) {
-                saveUserEnteredReminderToLocalDb()
+                saveUserEnteredReminderToLocalDbAndStartGeofence()
             }
 
         }
 
     }
 
-    private fun saveUserEnteredReminderToLocalDb() {
+    private fun saveUserEnteredReminderToLocalDbAndStartGeofence() {
         val title = _viewModel.reminderTitle.value
         val description = _viewModel.reminderDescription.value
         val location = _viewModel.reminderSelectedLocationStr.value

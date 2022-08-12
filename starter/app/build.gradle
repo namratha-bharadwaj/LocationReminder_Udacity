@@ -37,6 +37,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        pickFirst 'META-INF/AL2.0'
+        pickFirst 'META-INF/LGPL2.1'
+    }
 }
 
 dependencies {
@@ -77,6 +81,8 @@ dependencies {
     //Koin
     implementation "org.koin:koin-android:$koinVersion"
     implementation "org.koin:koin-androidx-viewmodel:$koinVersion"
+
+
 
 
     // Dependencies for local unit tests
@@ -120,6 +126,9 @@ dependencies {
     implementation "com.google.android.gms:play-services-maps:$playServicesVersion"
 
     //Firebase
-    implementation "com.firebaseui:firebase-ui-auth:$firebaseUi"
+    //implementation "com.firebaseui:firebase-ui-auth:$firebaseUi"
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:29.0.2')
+    implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
 
 }

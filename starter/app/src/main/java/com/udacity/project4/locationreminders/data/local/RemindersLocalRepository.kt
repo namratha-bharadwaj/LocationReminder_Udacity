@@ -3,6 +3,7 @@ package com.udacity.project4.locationreminders.data.local
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.dto.Result
+import com.udacity.project4.utils.CommonConstants
 import kotlinx.coroutines.*
 
 /**
@@ -50,7 +51,7 @@ class RemindersLocalRepository(
             if (reminder != null) {
                 return@withContext Result.Success(reminder)
             } else {
-                return@withContext Result.Error("Reminder not found!")
+                return@withContext Result.Error(CommonConstants.REMINDER_NOT_FOUND_ERROR)
             }
         } catch (e: Exception) {
             return@withContext Result.Error(e.localizedMessage)
