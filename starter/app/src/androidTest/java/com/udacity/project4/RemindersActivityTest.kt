@@ -123,7 +123,6 @@ class RemindersActivityTest : AutoCloseKoinTest() {// Extended Koin Test - embed
             Espresso.onView(ViewMatchers.withText(reminder.location))
                 .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
         }
-
     }
 
     @Test
