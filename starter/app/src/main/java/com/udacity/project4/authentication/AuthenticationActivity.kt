@@ -25,20 +25,21 @@ class AuthenticationActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAuthenticationBinding
     private val TAG = "LoginFragment"
-    private val registerActivityForResult = this.registerForActivityResult(FirebaseAuthUIActivityResultContract()) { result ->
-        this.handleSigninResult(result)
+    private val registerActivityForResult = registerForActivityResult(
+        FirebaseAuthUIActivityResultContract()
+    ) { result ->
+        handleSigninResult(result)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAuthenticationBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_authentication)
         binding.loginSignupButton.setOnClickListener {
             launchSigninFlow()
         }
     }
 
-    private fun launchSigninFlow() {
+    fun launchSigninFlow() {
         val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build(), AuthUI.IdpConfig.GoogleBuilder().build())
 
         val intent = AuthUI.getInstance()
@@ -54,7 +55,7 @@ class AuthenticationActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK) {
             //Signin successful
             val user = FirebaseAuth.getInstance().currentUser?.displayName
-            Toast.makeText(this, "Signin successful for $user", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Signin successful for $user", Toast.LENGTH_SHORT).show()
             Log.i(TAG, "Signin successful for user: $user")
             startActivity(Intent(this, RemindersActivity::class.java))
         } else {
