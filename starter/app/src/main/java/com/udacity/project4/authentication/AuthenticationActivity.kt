@@ -38,9 +38,6 @@ class AuthenticationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_authentication)
         observeAuthStateAndSetContent()
-//        binding.loginSignupButton.setOnClickListener {
-//            launchSigninFlow()
-//        }
         binding.lifecycleOwner = this
     }
 
@@ -87,7 +84,6 @@ class AuthenticationActivity : AppCompatActivity() {
             val user = FirebaseAuth.getInstance().currentUser?.displayName
             Toast.makeText(this, "Signin successful for $user", Toast.LENGTH_SHORT).show()
             Log.i(TAG, "Signin successful for user: $user")
-//            startActivity(Intent(this, RemindersActivity::class.java))
             navigateToRemindersActivity()
         } else {
             //Signin failed. Show toast
