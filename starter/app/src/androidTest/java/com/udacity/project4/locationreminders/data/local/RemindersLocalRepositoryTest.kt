@@ -33,12 +33,18 @@ class RemindersLocalRepositoryTest {
     @get:Rule
     var instantExecutorRule=InstantTaskExecutorRule()
 
-    private lateinit var remindersDao: FakeRemindersDao
+    private lateinit var remindersDatabase: RemindersDatabase
+    private lateinit var remindersDao: RemindersDao
     private lateinit var remindersRepository: RemindersLocalRepository
 
     @Before
     fun setup() {
-        remindersDao = FakeRemindersDao()
+        remindersDatabase = Room.inMemoryDatabaseBuilder(
+            ApplicationProvider.getApplicationContext(),
+            RemindersDatabase::class.java
+        ).allowMainThreadQueries()
+            .build()
+        remindersDao = remindersDatabase.reminderDao()
         remindersRepository = RemindersLocalRepository(remindersDao, Dispatchers.Unconfined)
     }
 
