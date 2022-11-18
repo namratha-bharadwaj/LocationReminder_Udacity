@@ -16,6 +16,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -33,6 +34,7 @@ class SaveReminderViewModelTest {
 
     @Before
     fun setup() {
+        stopKoin()
         remindersList = mutableListOf()
         dataSource = FakeDataSource(remindersList)
         viewModel = SaveReminderViewModel(ApplicationProvider.getApplicationContext(), dataSource)

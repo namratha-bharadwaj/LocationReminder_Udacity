@@ -9,6 +9,7 @@ import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.udacity.project4.locationreminders.RemindersActivity
@@ -20,13 +21,16 @@ import com.udacity.project4.locationreminders.reminderslist.RemindersListViewMod
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.EspressoIdlingResource
+import com.udacity.project4.util.ToastMatcher
 import com.udacity.project4.util.monitorActivity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -52,7 +56,9 @@ class RemindersActivityTest : AutoCloseKoinTest() {// Extended Koin Test - embed
     /**
      * As we use Koin as a Service Locator Library to develop our code, we'll also use Koin to test our code.
      * at this step we will initialize Koin related code to be able to use it in out testing.
+     *
      */
+
     @Before
     fun init() {
         stopKoin()//stop the original app koin
@@ -127,7 +133,8 @@ class RemindersActivityTest : AutoCloseKoinTest() {// Extended Koin Test - embed
 
     @Test
     fun givenRemindersActivityLaunched_whenCreateAndSaveReminder_thenReminderisPopulated() = runBlocking {
-        ActivityScenario.launch(RemindersActivity::class.java)
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
 
         Espresso.onView(ViewMatchers.withId(R.id.noDataTextView))
             .check(ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)))
@@ -148,5 +155,12 @@ class RemindersActivityTest : AutoCloseKoinTest() {// Extended Koin Test - embed
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
         Espresso.onView(ViewMatchers.withText("Test description1"))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+
+        Thread.sleep(1000)
+
+        Espresso.onView(withText(R.string.reminder_saved))
+            .inRoot(ToastMatcher())
+            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+
     }
 }
