@@ -6,6 +6,7 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
@@ -14,13 +15,16 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.udacity.project4.R
+import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import com.udacity.project4.util.ToastMatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,7 +64,7 @@ class ReminderListFragmentTest: AutoCloseKoinTest() {
                     get() as ReminderDataSource
                 )
             }
-            single { RemindersLocalRepository(get()) as ReminderDataSource }
+            single { FakeDataSource() as ReminderDataSource }
             single { LocalDB.createRemindersDao(appContext) }
         }
 
@@ -80,7 +84,7 @@ class ReminderListFragmentTest: AutoCloseKoinTest() {
 
     @Test
     fun givenListOfRemindersInDB_whenFragmentIsLaunched_thenPopulatesReminders() {
-        runBlocking {
+        runBlockingTest {
             // GIVEN: load data to DB
             val reminder = ReminderDTO("title1","description1",
                 "location1",
@@ -103,7 +107,7 @@ class ReminderListFragmentTest: AutoCloseKoinTest() {
     }
 
     @Test
-    fun givenReminderListFragmentLaunched_whenAddReminderButtonClicked_thenNavigatesToSaveReminderScreen(){
+    fun givenReminderListFragmentLaunched_whenAddReminderButtonClicked_thenNavigatesToSaveReminderScreen() = runBlockingTest {
         // GIVEN
         val fragScenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
         val navController = Mockito.mock(NavController::class.java)
@@ -118,6 +122,22 @@ class ReminderListFragmentTest: AutoCloseKoinTest() {
         // THEN
         Mockito.verify(navController).navigate(ReminderListFragmentDirections.toSaveReminder())
 
+    }
+
+    @Test
+    fun remindersList_TestErrorMessage() = runBlockingTest {
+        // GIVEN - Add reminder & set test error message flag
+        (repository as FakeDataSource).setReturnError(true)
+        val reminder = ReminderDTO("Title1", "Description1", "", 0.0, 0.0)
+        repository.saveReminder(reminder)
+
+        // WHEN - Open reminders list
+        launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
+
+        //THEN - Check snackbar message as "Test error message"
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+            .check(ViewAssertions.matches(ViewMatchers.withText("GetRemindersMethod exception")))
+        Thread.sleep(1000)
     }
 
 }

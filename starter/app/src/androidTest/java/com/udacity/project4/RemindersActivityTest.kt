@@ -25,6 +25,7 @@ import com.udacity.project4.util.ToastMatcher
 import com.udacity.project4.util.monitorActivity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -115,7 +116,7 @@ class RemindersActivityTest : AutoCloseKoinTest() {// Extended Koin Test - embed
 
     @Test
     fun givenRemindersInDb_whenFragmentIsLaunched_thenRendersAllTheRemindersAsList() {
-        runBlocking {
+        runBlockingTest {
             val reminder = createReminder()
             repository.saveReminder(reminder)
 
@@ -132,7 +133,7 @@ class RemindersActivityTest : AutoCloseKoinTest() {// Extended Koin Test - embed
     }
 
     @Test
-    fun givenRemindersActivityLaunched_whenCreateAndSaveReminder_thenReminderisPopulated() = runBlocking {
+    fun givenRemindersActivityLaunched_whenCreateAndSaveReminder_thenReminderisPopulated() = runBlockingTest {
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
