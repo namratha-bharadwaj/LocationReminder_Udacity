@@ -13,9 +13,11 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.udacity.project4.locationreminders.RemindersActivity
+import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.local.LocalDB
+import com.udacity.project4.locationreminders.data.local.RemindersDao
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
@@ -25,13 +27,14 @@ import com.udacity.project4.util.ToastMatcher
 import com.udacity.project4.util.monitorActivity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -48,6 +51,7 @@ class RemindersActivityTest : AutoCloseKoinTest() {// Extended Koin Test - embed
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
 
+
     /**
      * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
      * are not scheduled in the main Looper (for example when executed on a different thread).
@@ -59,6 +63,12 @@ class RemindersActivityTest : AutoCloseKoinTest() {// Extended Koin Test - embed
      * at this step we will initialize Koin related code to be able to use it in out testing.
      *
      */
+
+//    @get: Rule
+//    var mainCoroutineRule = MainCoroutineRule()
+
+//    private val testDispatcher = TestCoroutineDispatcher()
+//    private val testScope = TestCoroutineScope(testDispatcher)
 
     @Before
     fun init() {
@@ -102,36 +112,6 @@ class RemindersActivityTest : AutoCloseKoinTest() {// Extended Koin Test - embed
         IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
     }
 
-    private fun createReminder(): ReminderDTO {
-
-        return ReminderDTO(
-            title = "title1",
-            description = "description1",
-            location = "location1",
-            latitude = 0.0,
-            longitude = 0.0
-        )
-
-    }
-
-    @Test
-    fun givenRemindersInDb_whenFragmentIsLaunched_thenRendersAllTheRemindersAsList() {
-        runBlockingTest {
-            val reminder = createReminder()
-            repository.saveReminder(reminder)
-
-            var activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
-            dataBindingIdlingResource.monitorActivity(activityScenario)
-
-            Espresso.onView(ViewMatchers.withText(reminder.title))
-                .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-            Espresso.onView(ViewMatchers.withText(reminder.description))
-                .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-            Espresso.onView(ViewMatchers.withText(reminder.location))
-                .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        }
-    }
-
     @Test
     fun givenRemindersActivityLaunched_whenCreateAndSaveReminder_thenReminderisPopulated() = runBlockingTest {
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
@@ -150,8 +130,6 @@ class RemindersActivityTest : AutoCloseKoinTest() {// Extended Koin Test - embed
         Espresso.onView(ViewMatchers.withId(R.id.save_location_btn)).perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withId(R.id.saveReminder)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.noDataTextView))
-            .check(ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
         Espresso.onView(ViewMatchers.withText("Test title1"))
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
         Espresso.onView(ViewMatchers.withText("Test description1"))
